@@ -15,13 +15,13 @@ app.use('/api/contact', rateLimit({ windowMs: 15 * 60 * 1000, max: 5, message: {
 
 
 const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: true,
-  auth: {
-    user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_APP_PASSWORD,
-  },
+  host: process.env.SMTP_HOST,
+    port: Number(process.env.SMTP_PORT) || 587,
+    secure: Number(process.env.SMTP_PORT) === 465,
+    auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS
+    }
 });
 
 transporter.verify((error, success) => {
@@ -43,7 +43,7 @@ app.post('/api/contact', async (req, res) => {
     return res.status(400).json({ error: 'Please fill in a valid name, email and message.' })
   try {
     await transporter.sendMail({
-      from: `"Portfolio Contact" <${process.env.GMAIL_USER}>`,
+      from: `"Portfolio Contact" <${process.env.SMTP_USER}>`,
       to: RECEIVER,
       replyTo: `"${name.replace(/"/g, '')}" <${email}>`,
       subject: `New portfolio message from ${name.slice(0, 60)}`,
