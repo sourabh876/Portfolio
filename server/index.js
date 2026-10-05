@@ -6,16 +6,17 @@ import rateLimit from 'express-rate-limit'
 
 
 const app = express()
+app.set("trust proxy", 1);
+
 const RECEIVER = process.env.RECEIVER_EMAIL || 'sourabh876007@gmail.com'
 app.use(express.json({ limit: '20kb' }))
 app.use(cors({ origin: (process.env.CLIENT_ORIGIN || 'http://localhost:5173').split(',') }))
 app.use('/api/contact', rateLimit({ windowMs: 15 * 60 * 1000, max: 5, message: { error: 'Too many messages. Try again later.' } }))
 
-app.set("trust proxy", 1);
 
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
-  port: 465,
+  port: 587,
   secure: true,
   auth: {
     user: process.env.GMAIL_USER,
